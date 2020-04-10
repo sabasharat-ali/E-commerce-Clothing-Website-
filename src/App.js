@@ -1,11 +1,15 @@
 import React from "react";
 import "./App.css";
 import { Switch, Route } from "react-router-dom";
+import { connect } from "react-redux";
+
 import SignInAndSignUpPage from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
 import HomePage from "./pages/homepage/homepage.component";
 import ShopPage from "./pages/shop/shop.component";
 import Header from "./components/header/header.component";
 import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
+
+import { setCurrentUser } from "./redux/user/users.actions";
 
 const HatsPage = () => (
   <div>
@@ -14,37 +18,29 @@ const HatsPage = () => (
 );
 
 class App extends React.Component {
-  constructor() {
-    super();
-
-    this.state = {
-      currentUser: null
-    };
-  }
-
   unsubscribeFromAuth = null;
 
   componentDidMount() {
-    this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+    const { setCurrentUser } = this.props;
+
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
       //IF WE HAVE A USER DO THIS (USER SIGNS IN)
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
 
-        userRef.onSnapshot(snapshot => {
-          //console.log(snapshot.data());
-          // WITHOUT .data it wont give the name and email
-          // SNAPSHOT TELLS US IF DATA EXISTS IN OUR DATABASE AND WITH .data WE CAN ACCESS THE DATA
-          this.setState({
-            currentUser: {
-              id: snapshot.id,
-              ...snapshot.data()
-            }
+        //console.log(snapshot.data());
+        // WITHOUT .data it wont give the name and email
+        // SNAPSHOT TELLS US IF DATA EXISTS IN OUR DATABASE AND WITH .data WE CAN ACCESS THE DATA
+        userRef.onSnapshot((snapshot) => {
+          setCurrentUser({
+            id: snapshot.id,
+            ...snapshot.data(),
           });
-          console.log(this.state);
         });
       }
+
       //IF WE DONT HAVE USER SET IT TO NULL LIKE THIS (USER SIGNS OUT)
-      this.setState({ currentUser: userAuth });
+      setCurrentUser(userAuth);
     });
   }
 
@@ -54,7 +50,9 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <Header currentUser={this.state.currentUser} />
+        <Header />
+        {/* NOW THE currentUser STATE WILL BE PROVIDED THROUGH REDUX */}
+        {/* <Header currentUser={this.state.currentUser} /> */}
         {/* WE HAVE TO MAKE SURE THAT OUR HEADER IS AWARE WHEN OUR USER IS SIGNED IN AND WHEN THE USER IS SIGNED OUT */}
         {/* AND WE WILL DO THAT BY GIVING HEADER THE CURRENT USER STATE */}
         <Switch>
@@ -68,4 +66,8 @@ class App extends React.Component {
   }
 }
 
-export default App;
+const mapDispatchToProps = (dispatch) => ({
+  setCurrentUser: (user) => dispatch(setCurrentUser(user)),
+});
+
+export default connect(null, mapDispatchToProps)(App);
