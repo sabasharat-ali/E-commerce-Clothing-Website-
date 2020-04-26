@@ -2,12 +2,19 @@
   "name": "crown-clothing",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "13.9.0",
+    "npm": "6.13.7"
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "express": "^4.17.1",
+    "express-favicon": "^2.0.1",
     "firebase": "^7.13.1",
     "node-sass": "^4.13.1",
+    "path": "^0.12.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",
@@ -39,5 +46,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "terser-brunch": "^4.0.0"
   }
 }
