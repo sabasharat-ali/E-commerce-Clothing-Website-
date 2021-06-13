@@ -35,6 +35,10 @@ const cartReducer = (state = INITIAL_STATE, action) => {
         ...state,
         cartItems: [],
       };
+    case CartActionTypes.PLACE_ORDER:
+      return {
+        ...state,
+      };
     default:
       return state;
   }
